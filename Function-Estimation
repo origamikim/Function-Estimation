@@ -1,0 +1,222 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Modules
+
+# In[1]:
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+import sympy as sym
+import scipy as sp
+from scipy.misc import derivative
+x=sym.Symbol('x')
+a=sym.Symbol('a')
+b=sym.Symbol('b')
+import matplotlib.pyplot as plt
+
+
+# # Lagrange Polynomial
+
+# In[19]:
+
+
+def Lagrange(xs, ys):
+    lagrange_basis = 0
+    set_xs = list(set(xs))
+    xs=list(xs)
+    if len(xs) > len(set_xs):
+        print('Invalid Points for Polynomial Function \n Two or More Same Points are Given!')
+        return None
+    for j in xs:
+        fx = 1
+        for i in xs:
+            if xs.index(i) != xs.index(j):
+                fx = fx * (x - i) * round( 1/(j - i), 20) 
+            else:
+                pass
+        fx = fx * ys[xs.index(j)]
+        lagrange_basis += fx
+    lagrange_basis = sym.simplify(lagrange_basis)
+    return lagrange_basis
+
+
+# # Polynomial
+
+# In[20]:
+
+
+def polynomial(xs, ys):
+    n=len(xs)
+    val=[]
+    for i in range(n):
+        val.append([ xs[i] ** j for j in range(n)])
+    val=np.array(val).reshape(n,n)
+    ys=np.array(ys).T
+    try:
+        cf=np.linalg.solve(val,ys)
+    except :
+        print('Invalid Points for Polynomial Function \n Two or More Same Points are Given!')
+        return None
+    fx=0
+    for i in range(n):
+        fx += cf[i]*x**i
+    return fx
+
+
+# # Trend Estimations
+
+# In[18]:
+
+
+def trend_line(xs,ys, y0 = True):
+    a=sym.Symbol('a')
+    b=sym.Symbol('b')
+    x=sym.Symbol('x')
+    if y0 == True:
+        tl=a*x+b
+        ex=0
+        for i in range(len(xs)):
+            ex += (ys[i]-tl.subs(x,xs[i]))**2 
+        daex=ex.diff(a)
+        dbex=ex.diff(b)
+        p=sym.solve((daex,dbex),(a,b),dict=False)
+        p=list(p.values())
+        sym.pprint(daex)
+        sym.pprint(dbex)
+        fig=plt.figure(figsize=(16,9))
+        ax=fig.subplots()
+        ax.scatter(xs,ys)
+        fx=p[0]*x+p[1]
+        yy=[fx.subs(x,i) for i in xs]
+        ax.plot(xs,yy,linewidth=4,color='red')
+        ax.spines['left'].set_position(('data',0))
+        ax.spines['bottom'].set_position(('data',0))
+        plt.show()
+        return fx
+    else:
+        tl = a*x + y0
+        ex = 0
+        for i in range(len(xs)):
+            ex += (ys[i]-tl.subs(x,xs[i]))**2 
+        daex=ex.diff(a)
+        p=sym.solve((daex),(a),dict=False)
+        sym.pprint(daex)
+        fig=plt.figure(figsize=(16,9))
+        ax=fig.subplots()
+        fx=p[0]*x+y0
+        yy=[fx.subs(x,i) for i in xs]
+        plt.title("Absorbance & Concentration")
+        ax.set_xlabel("Concentration of CuSO4(M)")
+        ax.set_ylabel("Absorbance")
+        ax.plot(xs,yy,linewidth=2,color='red', label = 'Trend Line')
+        ax.spines['left'].set_position(('data',0))
+        ax.spines['bottom'].set_position(('data',0))
+        ax.plot(x1,y1,linewidth= 4, linestyle = ':', marker = 'v')
+        ax.scatter(xs,ys, s=100, marker ='v',label='Real Value')
+        ax.legend(loc = 'center right')
+        plt.show()
+        return fx
+
+def trend_parabola(xs,ys):
+    a,b,c,x =sym.symbols('a,b,c,x')
+    tp=a*x**2+b*x+c
+    ex=0
+    for i in range(len(xs)):
+        ex += ( ys[i]-tp.subs(x,xs[i]) ) **2
+    ex=ex.expand()
+    dabex=ex.diff(a)
+    dbcex=ex.diff(b)
+    dcaex=ex.diff(c)
+    print(dabex)
+    print(dbcex)
+    print(dcaex)
+    p=sym.solve((dabex,dbcex,dcaex),(a,b,c),dict=False)
+    print(p)
+    p=list(p.values())
+    fig=plt.figure(figsize=(16,9))
+    ax=fig.subplots()
+    ax.scatter(xs,ys,marking = 'v')
+    fx=p[0]*x**2+p[1]*x+p[2]
+    yy=[fx.subs(x,i) for i in xs]
+    ax.plot(xs,yy,linewidth=4,color='red')
+    ax.spines['left'].set_position(('data',0))
+    ax.spines['bottom'].set_position(('data',0))
+    plt.show()
+    return fx
+
+
+# #### Graphs 
+
+# In[20]:
+
+
+x1 = [0,0.008,0.04,0.08,0.16,0.2]
+y1 = [0,0.013,0.055,0.113,0.231,0.291]
+trend_line(x1,y1,y0=0)
+
+
+# In[21]:
+
+
+trend_line(x1,y1)
+
+
+# In[59]:
+
+
+Lagrange(x1,y1)
+
+
+# In[52]:
+
+
+f=polynomial(x1,y1)
+
+
+# In[53]:
+
+
+def trend_line(xs,ys,y0=0):
+    tl = a*x + y0
+    ex = 0
+    for i in range(len(xs)):
+        ex += (ys[i]-tl.subs(x,xs[i]))**2 
+    daex=ex.diff(a)
+    p=sym.solve((daex),(a),dict=False)
+    sym.pprint(daex)
+    fig=plt.figure(figsize=(16,9))
+    ax=fig.subplots()
+    fx=p[0]*x+y0
+    yy=[fx.subs(x,i) for i in xs]
+    plt.title("Absorbance & Concentration")
+    ax.set_xlabel("Concentration of CuSo4(M)")
+    ax.set_ylabel("Absorbance")
+    ax.plot(xs,yy,linewidth=2,color='red', label = 'Trend Line')
+    ax.spines['left'].set_position(('data',0))
+    ax.spines['bottom'].set_position(('data',0))
+    ax.plot(x1,y1,linewidth= 4, linestyle = ':', marker = 'v')
+    ax.scatter(xs,ys, s=100, marker ='v',label='Real Value')
+    ax.legend(loc = 'center right')
+    plt.show()
+    return fx
+
+
+# In[89]:
+
+
+help(plt.scatter)
+
+
+# In[109]:
+
+
+0.220/0.0289
+
+
+# In[ ]:
+
+
+
+
