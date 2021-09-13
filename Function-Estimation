@@ -147,37 +147,6 @@ def trend_parabola(xs,ys):
     return fx
 
 
-# #### Graphs 
-
-# In[20]:
-
-
-x1 = [0,0.008,0.04,0.08,0.16,0.2]
-y1 = [0,0.013,0.055,0.113,0.231,0.291]
-trend_line(x1,y1,y0=0)
-
-
-# In[21]:
-
-
-trend_line(x1,y1)
-
-
-# In[59]:
-
-
-Lagrange(x1,y1)
-
-
-# In[52]:
-
-
-f=polynomial(x1,y1)
-
-
-# In[53]:
-
-
 def trend_line(xs,ys,y0=0):
     tl = a*x + y0
     ex = 0
@@ -201,22 +170,6 @@ def trend_line(xs,ys,y0=0):
     ax.legend(loc = 'center right')
     plt.show()
     return fx
-
-
-# In[89]:
-
-
-help(plt.scatter)
-
-
-# In[109]:
-
-
-0.220/0.0289
-
-
-# In[ ]:
-
 
 
 
